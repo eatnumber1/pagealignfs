@@ -1,0 +1,128 @@
+cc_library(
+    name = "status",
+    hdrs = ["status.h"],
+    srcs = [
+      "status.cc",
+      "errno.cc",
+    ],
+    deps = [
+      "@absl//absl/status",
+      "@absl//absl/status:statusor",
+      "@absl//absl/strings",
+      "@absl//absl/strings:cord",
+      "@absl//absl/container:flat_hash_map",
+    ],
+)
+
+cc_library(
+    name = "syscalls",
+    hdrs = [
+      "syscalls.h",
+      "fd.h",
+      "dir.h",
+      "mount.h",
+      "signal.h",
+    ],
+    srcs = [
+      "syscalls.cc",
+      "fd.cc",
+      "dir.cc",
+      "mount.cc",
+      "signal.cc",
+    ],
+    deps = [
+      ":status",
+      "@absl//absl/log",
+      "@absl//absl/log:check",
+      "@absl//absl/status",
+      "@absl//absl/status:statusor",
+      "@absl//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "fuse_ops",
+    hdrs = ["fuse_ops.h"],
+    deps = [
+      ":syscalls",
+      ":status",
+      "@absl//absl/status:statusor",
+      "@absl//absl/status",
+      "@absl//absl/log:check",
+      "@absl//absl/log",
+      "@absl//absl/log:die_if_null",
+      "@absl//absl/container:flat_hash_set",
+      "@absl//absl/strings:str_format",
+      "@fuse//:fuse",
+    ],
+)
+
+cc_library(
+    name = "fuse",
+    hdrs = ["fuse.h"],
+    srcs = ["fuse.cc"],
+    deps = [
+      ":syscalls",
+      ":status",
+      "@absl//absl/status:statusor",
+      "@absl//absl/status",
+      "@absl//absl/log:check",
+      "@absl//absl/log",
+      "@absl//absl/log:die_if_null",
+      "@absl//absl/container:flat_hash_set",
+      "@absl//absl/strings:str_format",
+      "@fuse//:fuse",
+    ],
+)
+
+cc_library(
+    name = "inode",
+    srcs = ["inode.cc"],
+    hdrs = ["inode.h"],
+    deps = [
+      ":syscalls",
+      ":status",
+      ":fuse",
+      "@absl//absl/log:check",
+      "@absl//absl/status",
+      "@absl//absl/log",
+      "@absl//absl/container:flat_hash_map",
+    ],
+)
+
+cc_library(
+    name = "page_align_fs",
+    srcs = ["page_align_fs.cc"],
+    hdrs = ["page_align_fs.h"],
+    deps = [
+      ":inode",
+      ":syscalls",
+      ":fuse",
+      ":fuse_ops",
+      ":status",
+      "@absl//absl/log:check",
+      "@absl//absl/status",
+      "@absl//absl/cleanup",
+      "@absl//absl/log",
+      "@absl//absl/container:flat_hash_map",
+    ],
+)
+
+cc_binary(
+    name = "main",
+    srcs = ["main.cc"],
+    deps = [
+      ":syscalls",
+      ":fuse",
+      ":fuse_ops",
+      ":status",
+      ":page_align_fs",
+      "@absl//absl/flags:flag",
+      "@absl//absl/status",
+      "@absl//absl/log",
+      "@absl//absl/log:initialize",
+      "@absl//absl/log:flags",
+      "@absl//absl/flags:parse",
+      "@absl//absl/flags:usage",
+    ],
+)

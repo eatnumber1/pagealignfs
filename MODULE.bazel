@@ -1,0 +1,14 @@
+module(name = "pagealignfs", version = "0.1")
+
+bazel_dep(name = "abseil-cpp", version = "20230802.0", repo_name="absl")
+
+bazel_dep(name = "libfuse", version="3.14.1", repo_name="fuse")
+local_path_override(
+    module_name = "libfuse",
+    path = "./third_party/libfuse",
+)
+
+local_path_override(
+    module_name = "linux-headers",
+    path = "./third_party/linux-headers",
+)
