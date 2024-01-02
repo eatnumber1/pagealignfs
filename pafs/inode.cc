@@ -31,13 +31,13 @@
 namespace pafs {
 namespace {
 
-absl::StatusOr<int> GetFileVersionFromPathFD(int fd) {
+absl::StatusOr<uint64_t> GetFileVersionFromPathFD(int fd) {
   ASSIGN_OR_RETURN(
       FileDescriptor myfd,
       syscalls::open(
         absl::StrCat("/proc/self/fd/", fd).c_str(), O_RDONLY | O_CLOEXEC));
 
-  int version = 0;
+  uint64_t version = 0;
   RETURN_IF_ERROR(syscalls::ioctl(*myfd, FS_IOC_GETVERSION, &version).status());
   return version;
 }
@@ -124,7 +124,7 @@ absl::StatusOr<Inode> Inode::Create(
 Inode::Inode(FileDescriptor fd, ino_t num, dev_t src_dev_num)
   : fd_(std::move(fd)), num_(num), src_dev_num_(src_dev_num) {}
 
-absl::StatusOr<int> Inode::GetGeneration() const {
+absl::StatusOr<uint64_t> Inode::GetGeneration() const {
   if (!generation_) generation_ = GetFileVersionFromPathFD(GetFD());
   return *generation_;
 }

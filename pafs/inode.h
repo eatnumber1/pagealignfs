@@ -39,7 +39,7 @@ class Inode {
   ino_t GetNumber() const;
   dev_t GetSourceDevice() const;
   int GetFD() const;
-  absl::StatusOr<int> GetGeneration() const;
+  absl::StatusOr<uint64_t> GetGeneration() const;
 
   void AddPollHandle(FusePollHandle handle);
   absl::Status NotifyPollEvent() const;
@@ -52,7 +52,7 @@ class Inode {
   FileDescriptor fd_;
   ino_t num_ = 0;
   dev_t src_dev_num_ = 0;
-  mutable std::optional<absl::StatusOr<int>> generation_;
+  mutable std::optional<absl::StatusOr<uint64_t>> generation_;
   FusePollHandle poll_handle_;
 };
 
